@@ -567,6 +567,48 @@
       </div>
     </div>
 
+    <!-- STEP 5 -->
+    <div class="step-section" style="margin-top: 14px;">
+      <div class="step-header">
+        <span class="step-badge">STEP 05</span>
+        <h2 class="step-title">1:1 방문 상담 신청 내역 — 구글 스프레드시트 자동 저장 &amp; 이메일 실시간 알림 연결</h2>
+      </div>
+
+      <ul class="guide-list">
+        <li class="guide-item">
+          <div class="num-circle">1</div>
+          <div class="guide-body">
+            <strong>구글 스프레드시트 생성 및 Apps Script 코드 붙여넣기</strong>
+            <p>
+              ① <span class="url-pill">https://sheets.new</span> 에 접속하여 새 구글 스프레드시트를 만들고 제목을 <strong>소마플로우 상담신청 내역</strong>으로 저장합니다.<br>
+              ② 상단 메뉴 <strong>[확장 프로그램] → [Apps Script]</strong>를 클릭합니다.<br>
+              ③ 기존 코드를 지우고, GitHub 저장소에 포함된 <code>google_apps_script.js</code> 파일의 내용을 그대로 복사해 붙여넣은 뒤 저장(<code>Ctrl+S</code>)합니다. (특정 이메일로 알림을 받고 싶다면 상단 <code>NOTIFY_EMAIL = "본인이메일@naver.com"</code>에 입력)
+            </p>
+          </div>
+        </li>
+        <li class="guide-item">
+          <div class="num-circle">2</div>
+          <div class="guide-body">
+            <strong>웹 앱(Web App)으로 배포하여 전용 URL 발급받기</strong>
+            <p>
+              ① Apps Script 우측 상단 <strong>[배포] → [새 배포]</strong> 클릭 → 왼쪽 톱니바퀴(유형 선택)에서 <strong>[웹 앱]</strong> 선택<br>
+              ② <em>다음 사용자 인증 정보로 실행:</em> <strong>나(Me)</strong> / <em>액세스 권한이 있는 사용자:</em> 반드시 <strong>모든 사용자(Anyone)</strong> 선택 후 <strong>[배포]</strong> 클릭<br>
+              ③ <strong>[액세스 승인]</strong> → 본인 구글 계정 선택 → <strong>[고급] → [안전하지 않은 페이지로 이동] → [허용]</strong> 클릭 후 생성된 <strong>웹 앱 URL</strong>(<code>https://script.google.com/macros/s/.../exec</code>)을 복사합니다.
+            </p>
+          </div>
+        </li>
+        <li class="guide-item">
+          <div class="num-circle">3</div>
+          <div class="guide-body">
+            <strong>GitHub의 js/main.js 파일에 웹 앱 URL 붙여넣기 (연동 완료!)</strong>
+            <p>
+              본인 GitHub 저장소의 <code>js/main.js</code> 파일을 열고 맨 윗줄 <code>const GOOGLE_SCRIPT_URL = "여기에_웹앱_URL_붙여넣기";</code> 에 복사한 주소를 넣은 뒤 <strong>[Commit changes]</strong>를 누르면, 이후 모든 상담 신청이 <strong>구글 시트에 자동 기록됨과 동시에 운영자 이메일로 실시간 알림</strong>이 발송됩니다!
+            </p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
     <div class="footer-note">
       SOMAFLOW PT STUDIO · Web Hosting &amp; Domain Setup Guide · Good Movement, Good Life
     </div>

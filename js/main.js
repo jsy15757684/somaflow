@@ -1,4 +1,11 @@
-// SOMAFLOW Studio - Interactive Script
+// ============================================================================
+// [소마플로우 운영자 설정] 1:1 방문 상담 신청 — 구글 스프레드시트 & 이메일 실시간 알림 연동
+// ----------------------------------------------------------------------------
+// 구글 스프레드시트(Apps Script)에서 발급받은 [웹 앱 URL]을 아래 큰따옴표 안에 붙여넣으세요.
+// (자세한 3분 설정법은 프로젝트 내 google_apps_script.js 또는 PDF 운영가이드를 참고하세요)
+// 예시: const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx.../exec";
+// ============================================================================
+const GOOGLE_SCRIPT_URL = "";
 
 function initSomaflow() {
   if (window.__somaflowInitialized) return;
@@ -175,10 +182,13 @@ function initSomaflow() {
     }
   }
 
-  // 8. Consultation Form Submission
+  // 8. Consultation Form Submission (Google Sheets + Email Real-time Notification)
   const consultForm = document.getElementById('consult-form');
+  const consultFeedback = document.getElementById('consult-feedback');
+  const submitBtn = document.getElementById('consult-submit-btn');
+
   if (consultForm) {
-    consultForm.addEventListener('submit', (e) => {
+    consultForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const nameInput = document.getElementById('client-name');
       const phoneInput = document.getElementById('client-phone');
@@ -186,25 +196,76 @@ function initSomaflow() {
       const timeInput = document.getElementById('client-time');
       const msgInput = document.getElementById('client-message');
 
-      const name = nameInput ? nameInput.value : '';
-      const phone = phoneInput ? phoneInput.value : '';
-      const interest = interestInput ? interestInput.value : '';
-      const time = timeInput ? timeInput.value : '';
-      const msg = msgInput ? msgInput.value : '';
+      const payload = {
+        name: nameInput ? nameInput.value.trim() : '',
+        phone: phoneInput ? phoneInput.value.trim() : '',
+        interest: interestInput ? interestInput.value : '',
+        time: timeInput ? timeInput.value : '',
+        message: msgInput ? msgInput.value.trim() : ''
+      };
 
-      const summary = `[소마플로우 1:1 상담 신청]\n- 성함: ${name}\n- 연락처: ${phone}\n- 관심 프로그램: ${interest}\n- 희망 시간대: ${time}\n- 문의내용: ${msg || '없음'}`;
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(summary).catch(() => {});
+      const originalBtnText = submitBtn ? submitBtn.innerHTML : '1:1 방문 상담 신청하기';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '상담 신청 접수 중...';
       }
 
-      const goTalk = confirm(
-        `[소마플로우] ${name || '회원'}님의 상담 신청 내역이 클립보드에 복사되었습니다.\n\n실시간 예약 확정을 위해 네이버 톡톡 상담창으로 바로 이동하시겠습니까?\n(톡톡 창에 붙여넣기 하시면 바로 전달됩니다)`
-      );
-      if (goTalk) {
-        window.open('https://talk.naver.com/ct/ws6eq0p?frm=mnmb&frm=nmb_detail#nafullscreen', '_blank');
+      try {
+        if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('https://script.google.com/')) {
+          // 구글 스프레드시트 자동 저장 + 운영자 이메일 실시간 알림 전송
+          await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+              'Content-Type': 'text/plain;charset=utf-8'
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (consultFeedback) {
+            consultFeedback.style.display = 'block';
+            consultFeedback.innerHTML = `
+              <div style="background: #FBF7EC; border: 1px solid #C9A84C; border-radius: 10px; padding: 18px 20px; margin-top: 16px; color: #2B2724; font-size: 13.5px; line-height: 1.7;">
+                <strong style="color: #A8862B; font-size: 14.5px;">✓ ${payload.name}님의 1:1 방문 상담 신청이 정상 접수되었습니다.</strong><br>
+                담당 대표 코치에게 실시간 알림이 전송되었으며, 남겨주신 연락처(<strong>${payload.phone}</strong>)로 빠르게 안내 연락드리겠습니다.
+              </div>
+            `;
+          } else {
+            alert(`[소마플로우] ${payload.name}님의 1:1 방문 상담 신청이 정상 접수되었습니다.\n남겨주신 연락처(${payload.phone})로 빠르게 연락드리겠습니다.`);
+          }
+          consultForm.reset();
+        } else {
+          // GOOGLE_SCRIPT_URL 미설정 시: 클립보드 복사 + 안내 박스 표시
+          const summary = `[소마플로우 1:1 상담 신청]\n- 성함: ${payload.name}\n- 연락처: ${payload.phone}\n- 관심 프로그램: ${payload.interest}\n- 희망 시간대: ${payload.time}\n- 문의내용: ${payload.message || '없음'}`;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(summary).catch(() => {});
+          }
+
+          if (consultFeedback) {
+            consultFeedback.style.display = 'block';
+            consultFeedback.innerHTML = `
+              <div style="background: #FBF7EC; border: 1px solid #C9A84C; border-radius: 10px; padding: 18px 20px; margin-top: 16px; color: #2B2724; font-size: 13.5px; line-height: 1.7;">
+                <strong style="color: #A8862B; font-size: 14.5px;">✓ 작성하신 상담 신청 내용이 복사되었습니다.</strong><br>
+                아래 버튼을 눌러 네이버 톡톡 상담창에 붙여넣기(Ctrl+V) 해 주시면 대표 코치가 즉시 확인합니다.<br>
+                <a href="https://talk.naver.com/ct/ws6eq0p?frm=mnmb&frm=nmb_detail#nafullscreen" target="_blank" rel="noopener noreferrer" class="btn btn-ink btn-sm" style="margin-top: 10px;">
+                  네이버 톡톡 상담창 열기 ›
+                </a>
+                <p style="font-size: 11.5px; color: #A39A86; margin-top: 10px;">
+                  * 운영자 안내: <code>js/main.js</code> 상단의 <code>GOOGLE_SCRIPT_URL</code>에 구글 시트 웹앱 주소를 입력하시면 톡톡 이동 없이 구글 스프레드시트 저장 및 이메일 실시간 알림이 자동 작동합니다.
+                </p>
+              </div>
+            `;
+          }
+          consultForm.reset();
+        }
+      } catch (err) {
+        alert('일시적인 네트워크 오류가 발생했습니다. 상단의 [네이버 톡톡] 버튼을 이용해 문의해 주세요.');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnText;
+        }
       }
-      consultForm.reset();
     });
   }
 
