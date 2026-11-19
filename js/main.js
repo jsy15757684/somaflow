@@ -1,20 +1,29 @@
 // SOMAFLOW Studio - Interactive Script
 
-document.addEventListener('DOMContentLoaded', () => {
+function initSomaflow() {
+  if (window.__somaflowInitialized) return;
+  window.__somaflowInitialized = true;
+
   // 1. Initialize Icons
   if (window.lucide) {
-    window.lucide.createIcons();
+    try {
+      window.lucide.createIcons();
+    } catch (err) {
+      console.warn('Lucide icon init skipped:', err);
+    }
   }
 
   // 2. Header Scroll Effect
   const header = document.querySelector('.site-header');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 40) {
-      header.classList.add('scrolled');
-    } else {
-      header.classList.remove('scrolled');
-    }
-  });
+  if (header) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 40) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+  }
 
   // 3. Mobile Navigation Drawer
   const mobileToggle = document.querySelector('.mobile-toggle');
@@ -23,11 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
 
   function openDrawer() {
+    if (!mobileDrawer) return;
     mobileDrawer.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
 
   function closeDrawer() {
+    if (!mobileDrawer) return;
     mobileDrawer.classList.remove('active');
     document.body.style.overflow = '';
   }
@@ -58,7 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const targetPanel = document.getElementById(targetId);
       if (targetPanel) {
         targetPanel.classList.add('active');
-        if (window.lucide) window.lucide.createIcons();
+        if (window.lucide) {
+          try { window.lucide.createIcons(); } catch (_) {}
+        }
       }
     });
   });
@@ -109,21 +122,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const question = item.querySelector('.faq-question');
     const answer = item.querySelector('.faq-answer');
 
-    question.addEventListener('click', () => {
-      const isOpen = item.classList.contains('active');
+    if (question && answer) {
+      question.addEventListener('click', () => {
+        const isOpen = item.classList.contains('active');
 
-      // Close all others
-      faqItems.forEach(otherItem => {
-        otherItem.classList.remove('active');
-        const otherAns = otherItem.querySelector('.faq-answer');
-        if (otherAns) otherAns.style.maxHeight = null;
+        faqItems.forEach(otherItem => {
+          otherItem.classList.remove('active');
+          const otherAns = otherItem.querySelector('.faq-answer');
+          if (otherAns) otherAns.style.maxHeight = null;
+        });
+
+        if (!isOpen) {
+          item.classList.add('active');
+          answer.style.maxHeight = answer.scrollHeight + 'px';
+        }
       });
-
-      if (!isOpen) {
-        item.classList.add('active');
-        answer.style.maxHeight = answer.scrollHeight + 'px';
-      }
-    });
+    }
   });
 
   // Open first FAQ by default
@@ -151,9 +165,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (selectedCount > 0) {
         resultAlert.style.display = 'block';
         resultAlert.innerHTML = `
-          <strong>💡 체크 결과 (${selectedCount}개 해당):</strong>
+          <strong>💡 체크 결과 (${selectedCount}개 항목 해당):</strong><br>
           현재 신체 불균형 또는 운동 시작의 어려움을 겪고 계신다면,
-          물리치료사 출신 대표 코치의 <strong>1:1 기능적 움직임 평가 및 최저 단계 맞춤 솔루션</strong>이 큰 도움이 됩니다.
+          물리치료사 출신 대표 코치의 <strong>1:1 기능적 움직임 평가 및 최저 단계(Level 0) 맞춤 솔루션</strong>을 추천합니다.
         `;
       } else {
         resultAlert.style.display = 'none';
@@ -161,16 +175,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 8. Consultation Form Submission Mockup
+  // 8. Consultation Form Submission
   const consultForm = document.getElementById('consult-form');
   if (consultForm) {
     consultForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const nameInput = document.getElementById('client-name');
       const phoneInput = document.getElementById('client-phone');
-      const name = nameInput ? nameInput.value : '';
+      const interestInput = document.getElementById('client-interest');
+      const timeInput = document.getElementById('client-time');
+      const msgInput = document.getElementById('client-message');
 
-      alert(`[소마플로우] ${name || '회원'}님의 상담 문의가 성공적으로 접수되었습니다.\n담당 코치가 확인 후 빠른 시간 내에 연락드리겠습니다.\n\n더 빠른 실시간 답변을 원하시면 상단의 [네이버 톡톡]을 이용해주세요.`);
+      const name = nameInput ? nameInput.value : '';
+      const phone = phoneInput ? phoneInput.value : '';
+      const interest = interestInput ? interestInput.value : '';
+      const time = timeInput ? timeInput.value : '';
+      const msg = msgInput ? msgInput.value : '';
+
+      const summary = `[소마플로우 1:1 상담 신청]\n- 성함: ${name}\n- 연락처: ${phone}\n- 관심 프로그램: ${interest}\n- 희망 시간대: ${time}\n- 문의내용: ${msg || '없음'}`;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(summary).catch(() => {});
+      }
+
+      const goTalk = confirm(
+        `[소마플로우] ${name || '회원'}님의 상담 신청 내역이 클립보드에 복사되었습니다.\n\n실시간 예약 확정을 위해 네이버 톡톡 상담창으로 바로 이동하시겠습니까?\n(톡톡 창에 붙여넣기 하시면 바로 전달됩니다)`
+      );
+      if (goTalk) {
+        window.open('https://talk.naver.com/ct/ws6eq0p?frm=mnmb&frm=nmb_detail#nafullscreen', '_blank');
+      }
       consultForm.reset();
     });
   }
@@ -182,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('scroll', () => {
     let current = '';
     sections.forEach(section => {
-      const sectionTop = section.offsetTop - 120;
+      const sectionTop = section.offsetTop - 130;
       const sectionHeight = section.offsetHeight;
       if (window.scrollY >= sectionTop && window.scrollY < sectionTop + sectionHeight) {
         current = section.getAttribute('id');
@@ -196,4 +229,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSomaflow);
+} else {
+  initSomaflow();
+}

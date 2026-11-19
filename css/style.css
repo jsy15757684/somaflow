@@ -104,6 +104,34 @@ button {
   background: none;
 }
 
+/* Fallback symbols if external icon CDN is delayed or blocked */
+i[data-lucide="check"]:empty::before {
+  content: '✓';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+}
+
+i[data-lucide="chevron-down"]:empty::before {
+  content: '▾';
+  font-style: normal;
+  font-size: 14px;
+  line-height: 1;
+}
+
+i[data-lucide="message-circle"]:empty::before {
+  content: '💬';
+  font-style: normal;
+  font-size: 13px;
+}
+
+i[data-lucide="calendar"]:empty::before {
+  content: '📅';
+  font-style: normal;
+  font-size: 13px;
+}
+
 input, textarea, select {
   font-family: inherit;
 }
