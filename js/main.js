@@ -7,6 +7,15 @@
 // ============================================================================
 const GOOGLE_SCRIPT_URL = "";
 
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function initSomaflow() {
   if (window.__somaflowInitialized) return;
   window.__somaflowInitialized = true;
@@ -195,14 +204,26 @@ function initSomaflow() {
       const interestInput = document.getElementById('client-interest');
       const timeInput = document.getElementById('client-time');
       const msgInput = document.getElementById('client-message');
+      const websiteInput = document.getElementById('client-website');
+      const consentInput = document.getElementById('client-consent');
+
+      if (consentInput && !consentInput.checked) {
+        alert('개인정보 수집·이용에 동의해 주셔야 상담 신청이 가능합니다.');
+        consentInput.focus();
+        return;
+      }
 
       const payload = {
         name: nameInput ? nameInput.value.trim() : '',
         phone: phoneInput ? phoneInput.value.trim() : '',
         interest: interestInput ? interestInput.value : '',
         time: timeInput ? timeInput.value : '',
-        message: msgInput ? msgInput.value.trim() : ''
+        message: msgInput ? msgInput.value.trim() : '',
+        website: websiteInput ? websiteInput.value : '',
+        consent: consentInput ? consentInput.checked : false
       };
+      const safeName = escapeHtml(payload.name);
+      const safePhone = escapeHtml(payload.phone);
 
       const originalBtnText = submitBtn ? submitBtn.innerHTML : '1:1 방문 상담 신청하기';
       if (submitBtn) {
@@ -226,8 +247,8 @@ function initSomaflow() {
             consultFeedback.style.display = 'block';
             consultFeedback.innerHTML = `
               <div style="background: #FBF7EC; border: 1px solid #C9A84C; border-radius: 10px; padding: 18px 20px; margin-top: 16px; color: #2B2724; font-size: 13.5px; line-height: 1.7;">
-                <strong style="color: #A8862B; font-size: 14.5px;">✓ ${payload.name}님의 1:1 방문 상담 신청이 정상 접수되었습니다.</strong><br>
-                담당 대표 코치에게 실시간 알림이 전송되었으며, 남겨주신 연락처(<strong>${payload.phone}</strong>)로 빠르게 안내 연락드리겠습니다.
+                <strong style="color: #A8862B; font-size: 14.5px;">✓ ${safeName}님의 1:1 방문 상담 신청이 정상 접수되었습니다.</strong><br>
+                담당 대표 코치에게 실시간 알림이 전송되었으며, 남겨주신 연락처(<strong>${safePhone}</strong>)로 빠르게 안내 연락드리겠습니다.
               </div>
             `;
           } else {

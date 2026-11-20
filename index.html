@@ -14,7 +14,7 @@
   <meta property="og:type" content="website">
 
   <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@1.66.0/dist/umd/lucide.min.js" integrity="sha384-Z6lHbMYcsXeWgvgnOFekAhjBtVQuTfjyNBGb7d7mrYjt5DNJspJJ9GBp9Kar/z7w" crossorigin="anonymous"></script>
   
   <!-- Custom Stylesheet (Lucier Editorial Luxury Theme) -->
   <link rel="stylesheet" href="./css/style.css">
@@ -691,14 +691,19 @@
 
           <div class="contact-right">
             <form id="consult-form">
+              <!-- 봇 차단용 숨김 칸 (사람에게는 보이지 않음) -->
+              <div style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;" aria-hidden="true">
+                <label for="client-website">Website</label>
+                <input type="text" id="client-website" name="website" tabindex="-1" autocomplete="off">
+              </div>
               <div class="form-grid-2">
                 <div class="form-group">
                   <label for="client-name" class="form-label">성함</label>
-                  <input type="text" id="client-name" class="form-input" placeholder="성함을 입력해 주세요" required>
+                  <input type="text" id="client-name" class="form-input" placeholder="성함을 입력해 주세요" maxlength="30" autocomplete="name" required>
                 </div>
                 <div class="form-group">
                   <label for="client-phone" class="form-label">연락처</label>
-                  <input type="tel" id="client-phone" class="form-input" placeholder="010-0000-0000" required>
+                  <input type="tel" id="client-phone" class="form-input" placeholder="010-0000-0000" maxlength="13" pattern="0[0-9]{1,2}(-| )?[0-9]{3,4}(-| )?[0-9]{4}" title="예: 010-1234-5678" autocomplete="tel" inputmode="tel" required>
                 </div>
               </div>
 
@@ -725,7 +730,25 @@
 
               <div class="form-group">
                 <label for="client-message" class="form-label">불편하신 부위 또는 운동 목표 (선택)</label>
-                <textarea id="client-message" class="form-textarea" placeholder="평소 불편하셨던 부위나 소마플로우에서 이루고 싶은 목표를 편하게 적어주세요."></textarea>
+                <textarea id="client-message" class="form-textarea" maxlength="1000" placeholder="평소 불편하셨던 부위나 소마플로우에서 이루고 싶은 목표를 편하게 적어주세요."></textarea>
+              </div>
+
+              <div class="form-group form-consent">
+                <label class="consent-label" for="client-consent">
+                  <input type="checkbox" id="client-consent" required>
+                  <span>[필수] 개인정보 수집·이용에 동의합니다.</span>
+                </label>
+                <details class="consent-details">
+                  <summary>개인정보 수집·이용 안내 보기</summary>
+                  <ul>
+                    <li><strong>수집 항목</strong>: 성함, 연락처, 관심 프로그램, 희망 방문 시간대, 문의 내용(선택)</li>
+                    <li><strong>이용 목적</strong>: 1:1 방문 상담 예약 확인 및 안내 연락</li>
+                    <li><strong>보유 기간</strong>: 상담 완료 후 1년간 보관 후 지체 없이 파기 (관계 법령에 따라 보존이 필요한 경우 해당 기간)</li>
+                    <li><strong>처리 위탁·국외 이전</strong>: Google LLC(미국) — 구글 스프레드시트·Gmail을 통한 접수 내역 저장 및 알림. 신청 시점에 인터넷으로 전송됩니다.</li>
+                    <li>동의를 거부하실 수 있으며, 이 경우 온라인 상담 신청이 제한됩니다. 네이버 톡톡이나 전화로도 문의하실 수 있습니다.</li>
+                    <li>문의 내용에는 상담에 꼭 필요한 정도로만 적어 주시고, 진단명 등 민감한 건강 정보는 방문 상담 시 말씀해 주세요.</li>
+                  </ul>
+                </details>
               </div>
 
               <button type="submit" id="consult-submit-btn" class="btn btn-gold-solid btn-lg" style="width: 100%;">

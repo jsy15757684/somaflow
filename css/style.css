@@ -1,5 +1,5 @@
 /* SOMAFLOW Studio — Inspired by LUCIER (lucier.kr) Warm Editorial Luxury & Holistic Wellness */
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,600&display=swap');
 
 :root {
@@ -1324,6 +1324,49 @@ input, textarea, select {
 .form-textarea {
   min-height: 96px;
   resize: vertical;
+}
+
+.form-consent {
+  font-size: 12.5px;
+  color: var(--lcx-soft);
+}
+
+.consent-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--lcx-ink);
+  font-weight: 600;
+}
+
+.consent-label input {
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  flex-shrink: 0;
+  accent-color: var(--lcx-gold);
+}
+
+.consent-details {
+  margin-top: 8px;
+  padding-left: 24px;
+}
+
+.consent-details summary {
+  cursor: pointer;
+  color: var(--lcx-gold);
+  font-size: 12px;
+}
+
+.consent-details ul {
+  margin: 8px 0 0;
+  padding: 12px 14px 12px 28px;
+  border: 1px solid var(--lcx-line);
+  border-radius: var(--lcx-radius-sm);
+  background: var(--lcx-bg);
+  line-height: 1.7;
+  font-size: 12px;
 }
 
 /* ==========================================================================
